@@ -1,17 +1,23 @@
 <?php // phpcs:ignore
 
 /**
- * Plugin Name:     Add WPGraphQL SEO
- * Plugin URI:      https://github.com/ashhitch/wp-graphql-yoast-seo
- * Description:     A WPGraphQL Extension that adds support for Yoast SEO
- * Author:          Ash Hitchcock
- * Author URI:      https://www.ashleyhitchcock.com
+ * Plugin Name:     Add WPGraphQL SEO MODIFIED FOR GATSBY
+ * Plugin URI:      https://github.com/snibbo71/wp-graphql-yoast-seo
+ * Description:     A WPGraphQL Extension that adds support for Yoast SEO, with a modification to fix full URLs on wordpress-source-gatsby
+ * Author:          Ash Hitchcock with modifications by Steve Brown
+ * Author URI:      https://www.most-useful.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
  * Version:         4.15.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
+
+ /* Switch the URLs in schema from this host, to the deployment host so that gatsby-source-wordpress will
+  * not nobble the URLs
+  */
+define('WP_ADMIN_HOST', 'wpadmin');
+define('WWW_HOST', 'www');
 
 if (!defined('ABSPATH')) {
     exit();
@@ -178,7 +184,7 @@ add_action('graphql_init', function () {
 
                     'schema' => [
                         'raw' => !empty($schemaArray)
-                            ? json_encode($schemaArray, JSON_UNESCAPED_SLASHES)
+                            ? str_replace(WP_ADMIN_HOST, WWW_HOST, json_encode($schemaArray, JSON_UNESCAPED_SLASHES))
                             : null,
                     ],
                     'archive' =>
@@ -198,12 +204,12 @@ add_action('graphql_init', function () {
                                         ->meta->for_post_type_archive($type)
                                         ->get_head()
                                 )
-                                    ? YoastSEO()
+                                    ? str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                         ->meta->for_post_type_archive($type)
-                                        ->get_head()
-                                    : YoastSEO()
+                                        ->get_head() )
+                                    : str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                         ->meta->for_post_type_archive($type)
-                                        ->get_head()->html,
+                                        ->get_head()->html),
                             ]
                             : [
                                 'hasArchive' => boolval(
@@ -233,12 +239,12 @@ add_action('graphql_init', function () {
                                         ->meta->for_post_type_archive($type)
                                         ->get_head()
                                 )
-                                    ? YoastSEO()
+                                    ? str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                         ->meta->for_post_type_archive($type)
-                                        ->get_head()
-                                    : YoastSEO()
+                                        ->get_head() )
+                                    : str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                         ->meta->for_post_type_archive($type)
-                                        ->get_head()->html,
+                                        ->get_head()->html ),
                             ],
                 ];
             }
@@ -724,7 +730,7 @@ add_action('graphql_init', function () {
                             get_bloginfo('name')
                         ),
                         'siteUrl' => wp_gql_seo_format_string(
-                            apply_filters('wp_gql_seo_site_url', get_site_url())
+                            apply_filters('wp_gql_seo_site_url', str_replace(WP_ADMIN_HOST, WWW_HOST, get_site_url() ))
                         ),
                         'inLanguage' => wp_gql_seo_format_string(
                             get_bloginfo('language')
@@ -910,12 +916,12 @@ add_action('graphql_init', function () {
                                             ->meta->for_post($post->ID)
                                             ->get_head()
                                     )
-                                        ? YoastSEO()
+                                        ? str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                             ->meta->for_post($post->ID)
-                                            ->get_head()
-                                        : YoastSEO()
+                                            ->get_head() )
+                                        : str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                             ->meta->for_post($post->ID)
-                                            ->get_head()->html,
+                                            ->get_head()->html ),
                                     'schema' => [
                                         'pageType' => is_array(
                                             YoastSEO()->meta->for_post($post->ID)
@@ -931,9 +937,9 @@ add_action('graphql_init', function () {
                                             ? YoastSEO()->meta->for_post($post->ID)
                                                 ->schema_article_type
                                             : [],
-                                        'raw' => json_encode(
+                                        'raw' => str_replace(WP_ADMIN_HOST, WWW_HOST, json_encode(
                                             $schemaArray,
-                                            JSON_UNESCAPED_SLASHES
+                                            JSON_UNESCAPED_SLASHES )
                                         ),
                                     ],
                                 ];
@@ -968,9 +974,9 @@ add_action('graphql_init', function () {
 
                             return [
                                 'schema' => [
-                                    'raw' => json_encode(
+                                    'raw' => str_replace(WP_ADMIN_HOST, WWW_HOST, json_encode(
                                         $schemaArray,
-                                        JSON_UNESCAPED_SLASHES
+                                        JSON_UNESCAPED_SLASHES )
                                     ),
                                 ],
                             ];
@@ -1052,12 +1058,12 @@ add_action('graphql_init', function () {
                             ->meta->for_author($user->userId)
                             ->get_head()
                     )
-                        ? YoastSEO()
+                        ? str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                             ->meta->for_author($user->userId)
-                            ->get_head()
-                        : YoastSEO()
+                            ->get_head() )
+                        : str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                             ->meta->for_author($user->userId)
-                            ->get_head()->html,
+                            ->get_head()->html ),
                     'social' => [
                         'facebook' => wp_gql_seo_format_string(
                             get_the_author_meta('facebook', $user->userId)
@@ -1089,7 +1095,7 @@ add_action('graphql_init', function () {
                     ],
 
                     'schema' => [
-                        'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                        'raw' => str_replace(WP_ADMIN_HOST, WWW_HOST, json_encode($schemaArray, JSON_UNESCAPED_SLASHES) ),
                     ],
                 ];
 
@@ -1223,16 +1229,16 @@ add_action('graphql_init', function () {
                                     ->meta->for_term($term->term_id)
                                     ->get_head()
                             )
-                                ? YoastSEO()
+                                ? str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                     ->meta->for_term($term->term_id)
-                                    ->get_head()
-                                : YoastSEO()
+                                    ->get_head() )
+                                : str_replace(WP_ADMIN_HOST, WWW_HOST, YoastSEO()
                                     ->meta->for_term($term->term_id)
-                                    ->get_head()->html,
+                                    ->get_head()->html ),
                             'schema' => [
-                                'raw' => json_encode(
+                                'raw' => str_replace(WP_ADMIN_HOST, WWW_HOST, json_encode(
                                     $schemaArray,
-                                    JSON_UNESCAPED_SLASHES
+                                    JSON_UNESCAPED_SLASHES )
                                 ),
                             ],
                         ];
