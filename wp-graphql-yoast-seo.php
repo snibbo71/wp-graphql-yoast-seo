@@ -16,8 +16,12 @@
  /* Switch the URLs in schema from this host, to the deployment host so that gatsby-source-wordpress will
   * not nobble the URLs
   */
-define('WP_ADMIN_HOST', 'wpadmin');
-define('WWW_HOST', 'www');
+if ( !defined('WP_ADMIN_HOST') ) {
+ define('WP_ADMIN_HOST', 'wpadmin');
+}
+if ( !defined('WWW_HOST') ) {
+ define('WWW_HOST', 'www');
+}
 
 if (!defined('ABSPATH')) {
     exit();
